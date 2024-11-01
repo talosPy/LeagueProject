@@ -7,6 +7,8 @@ class Match(models.Model):
     match_date = models.DateField()
     score = models.CharField(max_length=20, blank=True, null=True)
     is_active = models.BooleanField(default=True)
+    # fixture = 
+    # season =
 
     def __str__(self):
         return f"{self.home_team} vs {self.away_team} on {self.match_date}"
