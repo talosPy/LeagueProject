@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club List</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="index.html">League Manager</a>
+    </nav>
+
+    <div class="container my-5">
+        <h2 class="text-center">All Clubs</h2>
+        <ul id="club-list" class="list-group mt-4"></ul>
+        <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">Back to Home</button>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('http://127.0.0.1:8000/clubs/')
+                .then(response => response.json())
+                .then(data => {
+                    const clubList = document.getElementById('club-list');
+                    data.forEach(club => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'list-group-item';
+                        listItem.innerHTML = `<strong>${club.club_name}</strong> - ${club.city}`;
+                        clubList.appendChild(listItem);
+                    });
+                })
+                .catch(error => console.error('Error fetching club data:', error));
+        });
+    </script>
+</body>
+</html>

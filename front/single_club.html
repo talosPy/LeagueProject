@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Club</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .card {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Search for a Club</h1>
+        <div class="form-group">
+            <input type="text" id="club-search" class="form-control" placeholder="Enter club name">
+            <button class="btn btn-primary mt-2" onclick="searchClub()">Search</button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">Back to Home</button>
+        </div>
+        
+        <div id="club-card" class="card" style="display: none;">
+            <div class="card-body">
+                <h5 class="card-title" id="club-name">Club Name</h5>
+                <p class="card-text" id="club-city"><strong>City:</strong> </p>
+                <p class="card-text" id="club-stadium"><strong>Stadium:</strong> </p>
+                <p class="card-text" id="club-coach"><strong>Coach:</strong> </p>
+                <h6>Players:</h6>
+                <div id="players-container"></div>
+                <button class="btn btn-secondary" onclick="goBack()">Go Back</button>
+            </div>
+        </div>
+        
+        <div id="error-message" class="alert alert-danger mt-3" style="display: none;"></div>
+    </div>
+
+    <script>
+        function searchClub() {
+            const clubName = document.getElementById('club-search').value.trim();
+            const apiUrl = `http://127.0.0.1:8000/clubs/single/${clubName}/`; // Adjust according to your API endpoint
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.detail) {
+                        document.getElementById('club-card').style.display = 'none';
+                        document.getElementById('error-message').innerText = data.detail;
+                        document.getElementById('error-message').style.display = 'block';
+                    } else {
+                        document.getElementById('error-message').style.display = 'none';
+                        document.getElementById('club-name').innerText = data.club_name;
+                        document.getElementById('club-city').innerHTML = `<strong>City:</strong> ${data.city}`;
+                        document.getElementById('club-stadium').innerHTML = `<strong>Stadium:</strong> ${data.stadium}`;
+                        document.getElementById('club-coach').innerHTML = `<strong>Coach:</strong> ${data.coach}`;
+                        
+                        // Clear previous players
+                        const playersContainer = document.getElementById('players-container');
+                        playersContainer.innerHTML = ''; // Clear previous players
+
+                        // Check if players exist
+                        if (data.players && data.players.length > 0) {
+                            data.players.forEach(player => {
+                                // Create player card
+                                const playerCard = document.createElement('div');
+                                playerCard.className = 'card mt-2';
+                                playerCard.innerHTML = `
+                                    <div class="card-body">
+                                        <h5 class="card-title">${player.name}</h5>
+                                        <p class="card-text"><strong>Position:</strong> ${player.position}</p>
+                                        <p class="card-text"><strong>Age:</strong> ${player.age}</p>
+                                        <p class="card-text"><strong>Injured:</strong> ${player.is_injured ? 'Yes' : 'No'}</p>
+                                    </div>
+                                `;
+                                playersContainer.appendChild(playerCard);
+                            });
+                        } else {
+                            playersContainer.innerHTML = '<p>No players found for this club.</p>';
+                        }
+
+                        document.getElementById('club-card').style.display = 'block';
+                    }
+                })
+                .catch(error => console.error('Error fetching club details:', error));
+        }
+
+        function goBack() {
+            document.getElementById('club-search').value = '';
+            document.getElementById('club-card').style.display = 'none';
+            document.getElementById('error-message').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

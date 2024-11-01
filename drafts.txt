@@ -1,0 +1,23 @@
+
+ !!! possible league_table.html !!!
+
+
+fetch('/clubs/league-table/')
+  .then(response => response.json())
+  .then(data => {
+    let table = document.getElementById('leagueTable');
+    data.forEach(club => {
+      let row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${club.club_name}</td>
+        <td>${club.wins}</td>
+        <td>${club.draws}</td>
+        <td>${club.losses}</td>
+        <td>${club.goals_for}</td>
+        <td>${club.goals_against}</td>
+        <td>${club.goal_difference}</td>
+        <td>${club.points}</td>
+      `;
+      table.appendChild(row);
+    });
+  });

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Player</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .container {
+            margin-top: 50px;
+        }
+        .card {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add a New Player</h1>
+        <div class="card">
+            <div class="card-body">
+                <form id="add-player-form">
+                    <div class="form-group">
+                        <label for="player-name">Player Name</label>
+                        <input type="text" class="form-control" id="player-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="position">Position</label>
+                        <input type="text" class="form-control" id="position" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" class="form-control" id="age" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="is-injured">Injured</label>
+                        <select class="form-control" id="is-injured" required>
+                            <option value="false">No</option>
+                            <option value="true">Yes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="club">Club</label>
+                        <input type="number" class="form-control" id="club" placeholder="Enter Club ID" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Player</button>
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">Back to Home</button>
+                </form>
+                <div id="success-message" class="alert alert-success mt-3" style="display: none;"></div>
+                <div id="error-message" class="alert alert-danger mt-3" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('add-player-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Gather form data
+            const playerName = document.getElementById('player-name').value;
+            const position = document.getElementById('position').value;
+            const age = document.getElementById('age').value;
+            const isInjured = document.getElementById('is-injured').value;
+            const clubId = document.getElementById('club').value;
+
+            const apiUrl = 'http://127.0.0.1:8000/players/add/'; // Adjust the endpoint as necessary
+
+            // Send POST request to add the player
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    player_name: playerName,
+                    position: position,
+                    age: age,
+                    is_injured: isInjured === 'true', 
+                    club: clubId 
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.detail) {
+                    document.getElementById('success-message').style.display = 'none';
+                    document.getElementById('error-message').innerText = data.detail;
+                    document.getElementById('error-message').style.display = 'block';
+                } else {
+                    document.getElementById('error-message').style.display = 'none';
+                    document.getElementById('success-message').innerText = 'Player added successfully!';
+                    document.getElementById('success-message').style.display = 'block';
+                    document.getElementById('add-player-form').reset(); // Reset the form
+                }
+            })
+            .catch(error => {
+                console.error('Error adding player:', error);
+                document.getElementById('success-message').style.display = 'none';
+                document.getElementById('error-message').innerText = 'An error occurred while adding the player.';
+                document.getElementById('error-message').style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Player</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .card {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Search for a Player</h1>
+        <div class="form-group">
+            <input type="text" id="player-search" class="form-control" placeholder="Enter player name">
+            <button class="btn btn-primary mt-2" onclick="searchPlayer()">Search</button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">Back to Home</button>
+        </div>
+        
+        <div id="player-card" class="card" style="display: none;">
+            <div class="card-body">
+                <h5 class="card-title" id="player-name">Player Name</h5>
+                <p class="card-text" id="player-position"><strong>Position:</strong> </p>
+                <p class="card-text" id="player-age"><strong>Age:</strong> </p>
+                <p class="card-text" id="player-injured"><strong>Injured:</strong> </p>
+                <p class="card-text" id="player-club"><strong>Club:</strong> </p> <!-- New club field -->
+                <button class="btn btn-secondary" onclick="goBack()">Go Back</button>
+            </div>
+        </div>
+        
+        <div id="error-message" class="alert alert-danger mt-3" style="display: none;"></div>
+    </div>
+
+    <script>
+        function searchPlayer() {
+            const playerName = document.getElementById('player-search').value.trim();
+            const apiUrl = `http://127.0.0.1:8000/players/single/${playerName}/`; // Adjust according to your API endpoint
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.detail) {
+                        document.getElementById('player-card').style.display = 'none';
+                        document.getElementById('error-message').innerText = data.detail;
+                        document.getElementById('error-message').style.display = 'block';
+                    } else {
+                        document.getElementById('error-message').style.display = 'none';
+                        document.getElementById('player-name').innerText = data.player_name;
+                        document.getElementById('player-position').innerHTML = `<strong>Position:</strong> ${data.position}`;
+                        document.getElementById('player-age').innerHTML = `<strong>Age:</strong> ${data.age}`;
+                        document.getElementById('player-injured').innerHTML = `<strong>Injured:</strong> ${data.is_injured ? 'Yes' : 'No'}`;
+                        document.getElementById('player-club').innerHTML = `<strong>Club:</strong> ${data.club}`; // Display the club name
+                        document.getElementById('player-card').style.display = 'block';
+                    }
+                })
+                .catch(error => console.error('Error fetching player details:', error));
+        }
+
+        function goBack() {
+            document.getElementById('player-search').value = '';
+            document.getElementById('player-card').style.display = 'none';
+            document.getElementById('error-message').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
