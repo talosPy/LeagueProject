@@ -1,8 +1,9 @@
 from django.contrib import admin
 from .models import Match
 
-@admin.register(Match)
 class MatchAdmin(admin.ModelAdmin):
-    list_display = ('home_team', 'away_team', 'match_date', 'score', 'is_active')
-    search_fields = ('home_team__club_name', 'away_team__club_name')
-    list_filter = ('is_active', 'match_date')
+    list_display = ('home_team', 'away_team', 'match_date', 'goals_home', 'goals_away')
+    search_fields = ('home_team__name', 'away_team__name')
+    list_filter = ('match_date',)
+
+admin.site.register(Match, MatchAdmin)

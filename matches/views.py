@@ -1,3 +1,101 @@
 from django.shortcuts import render
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Match, LeagueTable  # Ensure LeagueTable is imported
+from .serializers import MatchSerializer, LeagueTableSerializer
+import random
+from datetime import date, timedelta
+from clubs.models import Club
+from django.db.models import Sum, F
 
-# Create your views here.
+# List of team IDs based on your setup
+team_ids = [1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+
+@api_view(['POST'])
+def add_match(request):
+    """Add a match to the league."""
+    if request.method == 'POST':
+        serializer = MatchSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+@api_view(['POST'])
+def automate_matches(request):
+    """Automatically create matches for specified teams and update league tables."""
+    teams = Club.objects.filter(id__in=team_ids)
+    matches_created = []
+
+    for i in range(len(teams)):
+        for j in range(i + 1, len(teams)):
+            home_team = teams[i]  # This is a Club instance
+            away_team = teams[j]  # This is a Club instance
+            match_date = date.today() + timedelta(days=len(matches_created))
+
+            # Randomize scores
+            goals_home = random.randint(0, 5)
+            goals_away = random.randint(0, 5)
+
+            match = Match.objects.create(
+                home_team=home_team,
+                away_team=away_team,
+                match_date=match_date,
+                goals_home=goals_home,
+                goals_away=goals_away
+            )
+            matches_created.append(match)
+
+            # Update league standings for both teams
+            update_league_table(home_team)
+            update_league_table(away_team)
+
+    return Response({"matches_created": len(matches_created)}, status=201)
+
+def update_league_table(team):
+    """Update league table for a given team based on match results."""
+    matches = Match.objects.filter(home_team=team) | Match.objects.filter(away_team=team)
+
+    wins = matches.filter(goals_home__gt=F('goals_away')).count() if team == matches.first().home_team else matches.filter(goals_home__lt=F('goals_away')).count()
+    losses = matches.filter(goals_home__lt=F('goals_away')).count() if team == matches.first().home_team else matches.filter(goals_home__gt=F('goals_away')).count()
+    draws = matches.filter(goals_home=F('goals_away')).count()
+
+    goals_for = matches.aggregate(Sum('goals_home'))['goals_home__sum'] if team == matches.first().home_team else matches.aggregate(Sum('goals_away'))['goals_away__sum']
+    goals_against = matches.aggregate(Sum('goals_away'))['goals_away__sum'] if team == matches.first().home_team else matches.aggregate(Sum('goals_home'))['goals_home__sum']
+
+    # Update or create league table entry for the team
+    LeagueTable.objects.update_or_create(
+        team=team,
+        defaults={
+            'wins': wins,
+            'losses': losses,
+            'draws': draws,
+            'goals_for': goals_for,
+            'goals_against': goals_against,
+        }
+    )
+
+@api_view(['GET'])
+def list_matches(request):
+    """List all matches."""
+    matches = Match.objects.all()
+    serializer = MatchSerializer(matches, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def list_league_table(request):
+    league_table = LeagueTable.objects.all().order_by('-wins', '-draws')  # Order by wins and draws
+    serializer = LeagueTableSerializer(league_table, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+def generate_league_table(request):
+    """Generate or update the league table based on current match results."""
+    teams = Club.objects.all()  # Get all clubs
+    for team in teams:
+        update_league_table(team)  # Call the function to update the league table for each team
+
+    return Response({"message": "League table updated successfully."}, status=200)
+
