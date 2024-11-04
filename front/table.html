@@ -16,6 +16,7 @@
 </head>
 <body>
     <h1>League Table</h1>
+    <button id="reset-table-btn" class="btn btn-primary">Generate New League Table</button>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -40,21 +41,20 @@
                     throw new Error('Network response was not ok');
                 }
                 const data = await response.json();
-                console.log(data); // Log the response data to check its structure
                 populateTable(data);
             } catch (error) {
                 console.error('There was a problem with the fetch operation:', error);
             }
         }
-    
+
         function populateTable(data) {
             const tableBody = document.getElementById('league-table-body');
             tableBody.innerHTML = ''; // Clear existing rows
-    
+
             data.forEach(row => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${row.club_name}</td>  <!-- Changed from row.team_name to row.club_name -->
+                    <td>${row.club_name}</td>
                     <td>${row.wins}</td>
                     <td>${row.losses}</td>
                     <td>${row.draws}</td>
@@ -64,8 +64,35 @@
                 tableBody.appendChild(tr);
             });
         }
-    
+
+        // Register the service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                })
+                .catch(error => {
+                    console.error('Service Worker registration failed:', error);
+                });
+            });
+        }
+
         // Fetch the league table when the page loads
         document.addEventListener('DOMContentLoaded', fetchLeagueTable);
+
+        // Add event listener for the button to reset the league table
+        document.getElementById('reset-table-btn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/matches/reset/', { method: 'POST' });
+                if (!response.ok) {
+                    throw new Error('Failed to reset league table');
+                }
+                await fetchLeagueTable(); // Fetch the new league table after reset
+            } catch (error) {
+                console.error('Error resetting league table:', error);
+            }
+        });
     </script>
-    
+</body>
+</html>
