@@ -26,7 +26,8 @@
                 <p class="card-text" id="player-position"><strong>Position:</strong> </p>
                 <p class="card-text" id="player-age"><strong>Age:</strong> </p>
                 <p class="card-text" id="player-injured"><strong>Injured:</strong> </p>
-                <p class="card-text" id="player-club"><strong>Club:</strong> </p> <!-- New club field -->
+                <p class="card-text" id="player-club"><strong>Club:</strong> </p>
+                <button class="btn btn-danger" id="delete-button" onclick="deletePlayer()" style="display: none;">Delete Player</button>
                 <button class="btn btn-secondary" onclick="goBack()">Go Back</button>
             </div>
         </div>
@@ -52,17 +53,46 @@
                         document.getElementById('player-position').innerHTML = `<strong>Position:</strong> ${data.position}`;
                         document.getElementById('player-age').innerHTML = `<strong>Age:</strong> ${data.age}`;
                         document.getElementById('player-injured').innerHTML = `<strong>Injured:</strong> ${data.is_injured ? 'Yes' : 'No'}`;
-                        document.getElementById('player-club').innerHTML = `<strong>Club:</strong> ${data.club}`; // Display the club name
+                        document.getElementById('player-club').innerHTML = `<strong>Club:</strong> ${data.club}`; 
                         document.getElementById('player-card').style.display = 'block';
+                        
+                        // Show the delete button
+                        document.getElementById('delete-button').style.display = 'inline-block';
                     }
                 })
                 .catch(error => console.error('Error fetching player details:', error));
+        }
+
+        function deletePlayer() {
+            const playerName = document.getElementById('player-name').innerText;
+            console.log("Attempting to delete player:", playerName); // Log player name
+            const apiUrl = `http://127.0.0.1:8000/players/delete-by-name/`; // Adjust according to your API endpoint
+
+            fetch(apiUrl, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: playerName })
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Player deleted successfully!');
+                    goBack(); // Go back to the search state
+                } else {
+                    return response.json().then(errorData => {
+                        alert('Failed to delete player: ' + errorData.error);
+                    });
+                }
+            })
+            .catch(error => console.error('Error deleting player:', error));
         }
 
         function goBack() {
             document.getElementById('player-search').value = '';
             document.getElementById('player-card').style.display = 'none';
             document.getElementById('error-message').style.display = 'none';
+            document.getElementById('delete-button').style.display = 'none'; // Hide the delete button
         }
     </script>
 </body>

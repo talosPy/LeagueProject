@@ -28,6 +28,7 @@
                 <p class="card-text" id="club-coach"><strong>Coach:</strong> </p>
                 <h6>Players:</h6>
                 <div id="players-container"></div>
+                <button class="btn btn-danger" onclick="deleteClub()">Delete Club</button>
                 <button class="btn btn-secondary" onclick="goBack()">Go Back</button>
             </div>
         </div>
@@ -82,6 +83,30 @@
                     }
                 })
                 .catch(error => console.error('Error fetching club details:', error));
+        }
+
+        function deleteClub() {
+            const clubName = document.getElementById('club-name').innerText; // Get the club name from the heading
+            const apiUrl = `http://127.0.0.1:8000/clubs/delete-by-name/`; // Ensure this matches your endpoint
+
+            fetch(apiUrl, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ club_name: clubName })  // Sending the club name to delete
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Club deleted successfully!');
+                    goBack(); // Optionally redirect or reset the view
+                } else {
+                    return response.json().then(data => {
+                        alert(data.error || 'Failed to delete club. Please try again.');
+                    });
+                }
+            })
+            .catch(error => console.error('Error deleting club:', error));
         }
 
         function goBack() {

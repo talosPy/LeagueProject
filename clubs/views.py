@@ -6,64 +6,6 @@ from .models import Club
 from players.models import Player
 from .serializers import LeagueTableSerializer, ClubSerializer
 
-# @api_view(['GET'])
-# def league_table_view(request):
-#     clubs = Club.objects.filter(is_active=True)
-#     standings = []
-
-#     for club in clubs:
-#         # Initialize statistics
-#         wins = draws = losses = goals_for = goals_against = 0
-        
-#         # Calculate stats based on match data
-#         home_matches = Match.objects.filter(home_team=club, is_active=False)
-#         away_matches = Match.objects.filter(away_team=club, is_active=False)
-
-#         for match in home_matches:
-#             if match.score:
-#                 home_goals, away_goals = map(int, match.score.split('-'))
-#                 goals_for += home_goals
-#                 goals_against += away_goals
-#                 if home_goals > away_goals:
-#                     wins += 1
-#                 elif home_goals < away_goals:
-#                     losses += 1
-#                 else:
-#                     draws += 1
-
-#         for match in away_matches:
-#             if match.score:
-#                 away_goals, home_goals = map(int, match.score.split('-'))
-#                 goals_for += away_goals
-#                 goals_against += home_goals
-#                 if away_goals > home_goals:
-#                     wins += 1
-#                 elif away_goals < home_goals:
-#                     losses += 1
-#                 else:
-#                     draws += 1
-
-#         points = wins * 3 + draws
-#         goal_difference = goals_for - goals_against
-
-#         standings.append({
-#             'club_name': club.club_name,
-#             'wins': wins,
-#             'draws': draws,
-#             'losses': losses,
-#             'goals_for': goals_for,
-#             'goals_against': goals_against,
-#             'goal_difference': goal_difference,
-#             'points': points
-#         })
-
-#     # Sort standings by points, goal difference, then goals scored
-#     standings.sort(key=lambda x: (x['points'], x['goal_difference'], x['goals_for']), reverse=True)
-
-#     serializer = LeagueTableSerializer(standings, many=True)
-#     return Response(serializer.data)
-
-
 
 @api_view(['GET'])
 def club_list(request):
@@ -97,3 +39,15 @@ def single_club_view(request, club_name):
         'players': players_data
     }
     return Response(data)
+
+
+@api_view(['DELETE'])
+def delete_club_by_name(request):
+    if request.method == 'DELETE':
+        club_name = request.data.get('club_name', '').strip()  # Get the club name from the request body
+        try:
+            club = Club.objects.get(club_name=club_name)  # Adjust according to your field name
+            club.delete()
+            return Response({'message': 'Club deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+        except Club.DoesNotExist:
+            return Response({'error': 'Club not found.'}, status=status.HTTP_404_NOT_FOUND)

@@ -41,3 +41,16 @@ def add_player(request):
             serializer.save(club=club)  
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+def delete_player_by_name(request):
+    if request.method == 'DELETE':
+        name = request.data.get('name', '').strip()  # Get the player name from the request body
+        try:
+            player = Player.objects.get(player_name=name)  # Ensure to use player_name
+            player.delete()
+            return Response({'message': 'Player deleted successfully!'}, status=204)
+        except Player.DoesNotExist:
+            return Response({'error': 'Player not found.'}, status=404)
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)  # Return error message for unexpected issues
