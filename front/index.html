@@ -1,70 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>The Super League!</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <style>
-        .hero-section {
-            background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTujkeMQ8tty0EPBZwnsAcpeiQ6jM-CuKGqKg&s');
-            background-size: cover;
-            background-position: center;
-            height: 60vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-            margin: 40px 30px;
-            padding: 150px
-
-        }
-        .hero-text {
-            text-align: center;
-        }
+      .hero-section {
+        background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTujkeMQ8tty0EPBZwnsAcpeiQ6jM-CuKGqKg&s");
+        background-size: cover;
+        background-position: center;
+        height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        margin: 40px 30px;
+        padding: 150px;
+      }
+      .hero-text {
+        text-align: center;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">League Manager</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="club_list.html">Clubs</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="single_club.html">Search Club</a>
-                <li class="nav-item">
-                        <a class="nav-link" href="add_club.html">Add Club</a>
-                <li class="nav-item">
-                            <a class="nav-link" href="single_player.html">Search Player</a>
-                <li class="nav-item">
-                            <a class="nav-link" href="add_player.html">Add Player</a>
-                    <li class="nav-item">
-                            <a class="nav-link" href="table.html">League Table</a> 
-                    <li class="nav-item">
-                            <a class="nav-link" href="generate_league.html">Generate League</a>   
-      
-       
-                </li>
-            </ul>
-        </div>
+      <a class="navbar-brand" href="#">League Manager</a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarNav"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="club_list.html">Clubs</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="single_club.html">Search Club</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="add_club.html">Add Club</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="single_player.html">Search Player</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="add_player.html">Add Player</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="table.html">League Table</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="generate_league.html">Generate League</a>
+          </li>
+            <a class="nav-link" href="login.html">Login</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="register.html">Register</a>
+          </li>
+            
+           <li class="nav-item" id="userStatus">
+
+
+        </ul>
+      </div>
     </nav>
 
     <div class="hero-section">
-        <div class="hero-text">
-            <h1>Welcome to Talos's Super League</h1>
-            <p>This is the Football Manager, For Those Who Like Top Teams to Perform Daily!.</p>
-            <a href="club_list.html" class="btn btn-primary mt-3">Explore Clubs</a>
-        </div>
+      <div class="hero-text">
+        <h1>Welcome to Talos's Super League</h1>
+        <p>
+          This is the Football Manager, For Those Who Like Top Teams to Perform
+          Daily!
+        </p>
+        <a href="club_list.html" class="btn btn-primary mt-3">Explore Clubs</a>
+      </div>
     </div>
-    
+
     <footer class="bg-dark text-white text-center py-3">
-        &copy; 2024 Talos's League. All rights reserved.
+      &copy; 2024 Talos's League. All rights reserved.
     </footer>
-</body>
+    
+    <script>
+      // Fetch user data and update the navbar
+      const updateUserStatus = async () => {
+        const apiUrl = `http://127.0.0.1:8000/users/user/`; // Adjust according to your API endpoint
+        const access = localStorage.getItem("access_token");
+
+        if (!access) {
+          document.getElementById("userStatus").innerHTML =
+            '<a class="nav-link" href="login.html">Login</a>';
+          return;
+        }
+
+        try {
+          const response = await fetch(apiUrl, {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${access}`,
+              "Content-Type": "application/json",
+            },
+          });
+
+          if (!response.ok) throw new Error("User not authenticated");
+
+          const data = await response.json();
+
+          // Update the navbar with user info and logout button
+          const userRole = data.is_staff ? "Admin" : "User";
+          document.getElementById("userStatus").innerHTML = `
+            <span class="nav-link">Logged in as ${data.username} (${userRole})</span>
+            <button class="btn btn-outline-light ml-2" onclick="logout()">Logout</button>
+          `;
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          document.getElementById("userStatus").innerHTML =
+            '<a class="nav-link" href="login.html">Login</a>';
+        }
+      };
+
+      // Logout function to clear token and redirect
+      const logout = () => {
+        localStorage.removeItem("access_token");
+        window.location.href = "login.html";
+      };
+
+      updateUserStatus();
+    </script>
+  </body>
 </html>

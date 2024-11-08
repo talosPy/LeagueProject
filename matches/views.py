@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .models import Match, LeagueTable  # Ensure LeagueTable is imported
 from .serializers import MatchSerializer, LeagueTableSerializer
@@ -7,6 +7,9 @@ import random
 from datetime import date, timedelta
 from clubs.models import Club
 from django.db.models import Sum, F
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser
+
 
 # List of team IDs based on your setup
 team_ids = [1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]

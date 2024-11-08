@@ -1,13 +1,17 @@
 from django.shortcuts import render, get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from .models import Club
 from players.models import Player
 from .serializers import LeagueTableSerializer, ClubSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser
+
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def club_list(request):
     clubs = Club.objects.filter(is_active=True)  
     serializer = ClubSerializer(clubs, many=True)
@@ -15,6 +19,7 @@ def club_list(request):
 
 
 @api_view(['POST'])
+@permission_classes([IsAdminUser])
 def add_club(request):
     if request.method == 'POST':
         serializer = ClubSerializer(data=request.data)
@@ -27,6 +32,7 @@ def add_club(request):
 
 
 @api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def single_club_view(request, club_name):
     club = get_object_or_404(Club, club_name=club_name)
     players = Player.objects.filter(club=club)
@@ -42,6 +48,7 @@ def single_club_view(request, club_name):
 
 
 @api_view(['DELETE'])
+@permission_classes([IsAdminUser])
 def delete_club_by_name(request):
     if request.method == 'DELETE':
         club_name = request.data.get('club_name', '').strip()  # Get the club name from the request body

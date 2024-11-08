@@ -37,62 +37,75 @@
     </div>
 
     <script>
-        function searchClub() {
-            const clubName = document.getElementById('club-search').value.trim();
-            const apiUrl = `http://127.0.0.1:8000/clubs/single/${clubName}/`; // Adjust according to your API endpoint
+function searchClub() {
+    const clubName = document.getElementById('club-search').value.trim();
+    const apiUrl = `http://127.0.0.1:8000/clubs/single/${clubName}/`; // Adjust according to your API endpoint
 
-            fetch(apiUrl)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.detail) {
-                        document.getElementById('club-card').style.display = 'none';
-                        document.getElementById('error-message').innerText = data.detail;
-                        document.getElementById('error-message').style.display = 'block';
-                    } else {
-                        document.getElementById('error-message').style.display = 'none';
-                        document.getElementById('club-name').innerText = data.club_name;
-                        document.getElementById('club-city').innerHTML = `<strong>City:</strong> ${data.city}`;
-                        document.getElementById('club-stadium').innerHTML = `<strong>Stadium:</strong> ${data.stadium}`;
-                        document.getElementById('club-coach').innerHTML = `<strong>Coach:</strong> ${data.coach}`;
-                        
-                        // Clear previous players
-                        const playersContainer = document.getElementById('players-container');
-                        playersContainer.innerHTML = ''; // Clear previous players
+    const access = localStorage.getItem("access_token");
+    if (!access) {
+        alert("Access token not found. Please log in again.");
+        return;
+    }
 
-                        // Check if players exist
-                        if (data.players && data.players.length > 0) {
-                            data.players.forEach(player => {
-                                // Create player card
-                                const playerCard = document.createElement('div');
-                                playerCard.className = 'card mt-2';
-                                playerCard.innerHTML = `
-                                    <div class="card-body">
-                                        <h5 class="card-title">${player.name}</h5>
-                                        <p class="card-text"><strong>Position:</strong> ${player.position}</p>
-                                        <p class="card-text"><strong>Age:</strong> ${player.age}</p>
-                                        <p class="card-text"><strong>Injured:</strong> ${player.is_injured ? 'Yes' : 'No'}</p>
-                                    </div>
-                                `;
-                                playersContainer.appendChild(playerCard);
-                            });
-                        } else {
-                            playersContainer.innerHTML = '<p>No players found for this club.</p>';
-                        }
-
-                        document.getElementById('club-card').style.display = 'block';
-                    }
-                })
-                .catch(error => console.error('Error fetching club details:', error));
+    fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${access}`,
+            'Content-Type': 'application/json'
         }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.detail) {
+            document.getElementById('club-card').style.display = 'none';
+            document.getElementById('error-message').innerText = data.detail;
+            document.getElementById('error-message').style.display = 'block';
+        } else {
+            document.getElementById('error-message').style.display = 'none';
+            document.getElementById('club-name').innerText = data.club_name;
+            document.getElementById('club-city').innerHTML = `<strong>City:</strong> ${data.city}`;
+            document.getElementById('club-stadium').innerHTML = `<strong>Stadium:</strong> ${data.stadium}`;
+            document.getElementById('club-coach').innerHTML = `<strong>Coach:</strong> ${data.coach}`;
+            
+            // Clear previous players
+            const playersContainer = document.getElementById('players-container');
+            playersContainer.innerHTML = '';
+
+            if (data.players && data.players.length > 0) {
+                data.players.forEach(player => {
+                    const playerCard = document.createElement('div');
+                    playerCard.className = 'card mt-2';
+                    playerCard.innerHTML = `
+                        <div class="card-body">
+                            <h5 class="card-title">${player.name}</h5>
+                            <p class="card-text"><strong>Position:</strong> ${player.position}</p>
+                            <p class="card-text"><strong>Age:</strong> ${player.age}</p>
+                            <p class="card-text"><strong>Injured:</strong> ${player.is_injured ? 'Yes' : 'No'}</p>
+                        </div>
+                    `;
+                    playersContainer.appendChild(playerCard);
+                });
+            } else {
+                playersContainer.innerHTML = '<p>No players found for this club.</p>';
+            }
+
+            document.getElementById('club-card').style.display = 'block';
+        }
+    })
+    .catch(error => console.error('Error fetching club details:', error));
+}
 
         function deleteClub() {
             const clubName = document.getElementById('club-name').innerText; // Get the club name from the heading
             const apiUrl = `http://127.0.0.1:8000/clubs/delete-by-name/`; // Ensure this matches your endpoint
+            const access = localStorage.getItem("access_token")
 
             fetch(apiUrl, {
                 method: 'DELETE',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${access}`
+
                 },
                 body: JSON.stringify({ club_name: clubName })  // Sending the club name to delete
             })

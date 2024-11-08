@@ -18,19 +18,28 @@
     </div>
 
     <script>
+        // Assuming the token is stored in a constant called 'token'
+        const access = localStorage.getItem("access_token")
+
         document.addEventListener("DOMContentLoaded", function() {
-            fetch('http://127.0.0.1:8000/clubs/')
-                .then(response => response.json())
-                .then(data => {
-                    const clubList = document.getElementById('club-list');
-                    data.forEach(club => {
-                        const listItem = document.createElement('li');
-                        listItem.className = 'list-group-item';
-                        listItem.innerHTML = `<strong>${club.club_name}</strong> - ${club.city}`;
-                        clubList.appendChild(listItem);
-                    });
-                })
-                .catch(error => console.error('Error fetching club data:', error));
+            fetch('http://127.0.0.1:8000/clubs/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${access}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const clubList = document.getElementById('club-list');
+                data.forEach(club => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item';
+                    listItem.innerHTML = `<strong>${club.club_name}</strong> - ${club.city}`;
+                    clubList.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error('Error fetching club data:', error));
         });
     </script>
 </body>

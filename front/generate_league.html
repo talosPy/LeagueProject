@@ -19,12 +19,14 @@
         document.getElementById('automate-button').addEventListener('click', function() {
             automateMatches();
         });
+        const access = localStorage.getItem("access_token")
 
         function automateMatches() {
             fetch('http://127.0.0.1:8000/matches/automate/', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${access}`
                 }
             })
             .then(response => {
