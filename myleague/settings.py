@@ -1,21 +1,28 @@
 
 from pathlib import Path
-from datetime import datetime, timedelta 
+from datetime import datetime, timedelta
+from decouple import config
+import os
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+SECRET_KEY = config('SECRET_KEY')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*bly#xz95ilm-y3*qi&8tsu33#7a!+0*p#9%zm5%x#2cd7(i+7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
 
+# ALLOWED_HOSTS = ['my-shop-django-api-bwls.onrender.com', '127.0.0.1']
+# CORS_ALLOW_ALL_ORIGINS = True
+# CSRF_COOKIE_SECURE = True
+# CSRF_TRUSTED_ORIGINS = ['https://my-shop-django-api-bwls.onrender.com']
+# CSRF_ALLOWED_ORIGINS = ['https://my-shop-django-api-bwls.onrender.com']
 
 # Application definition
 
