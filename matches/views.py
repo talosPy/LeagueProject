@@ -12,7 +12,7 @@ from rest_framework.permissions import IsAdminUser
 
 
 # List of team IDs based on your setup
-team_ids = [1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
+team_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
 
 @api_view(["POST"])
