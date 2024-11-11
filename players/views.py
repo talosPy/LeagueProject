@@ -33,7 +33,7 @@ def single_player(request, player_name):
 
 
 @api_view(["POST"])
-@permission_classes([IsAdminUser])
+@permission_classes([IsAuthenticated])
 def add_player(request):
     if request.method == "POST":
         club_id = request.data.get("club")
