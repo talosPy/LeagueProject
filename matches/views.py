@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from .models import Match, LeagueTable  # Ensure LeagueTable is imported
+from .models import Match, LeagueTable  
 from .serializers import MatchSerializer, LeagueTableSerializer
 import random
 from datetime import date, timedelta
@@ -11,13 +11,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import IsAdminUser
 
 
-# List of team IDs based on your setup
+
 team_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
 
 @api_view(["POST"])
 def add_match(request):
-    """Add a match to the league."""
     serializer = MatchSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -27,10 +26,8 @@ def add_match(request):
 
 @api_view(["POST"])
 def automate_matches(request):
-    """Automatically create matches for specified teams and update league tables only if not already created."""
     teams = Club.objects.filter(id__in=team_ids)
 
-    # Check if any matches have already been created
     if Match.objects.exists():
         return Response({"message": "Matches have already been generated."}, status=400)
 
@@ -60,11 +57,9 @@ def play_fixture(request, fixture=0):
         home_team = match.home_team
         away_team = match.away_team
 
-        # Randomize scores
         goals_home = random.randint(0, 5)
         goals_away = random.randint(0, 5)
 
-        # Update league standings for both teams
         match.goals_away = goals_away
         match.goals_home = goals_home
         match.save()
@@ -74,7 +69,6 @@ def play_fixture(request, fixture=0):
 
 
 def update_league_table(team):
-    """Update league table for a given team based on match results."""
     matches = Match.objects.filter(home_team=team) | Match.objects.filter(
         away_team=team
     )
@@ -102,7 +96,6 @@ def update_league_table(team):
         else matches.aggregate(Sum("goals_home"))["goals_home__sum"]
     )
 
-    # Update or create league table entry for the team
     LeagueTable.objects.update_or_create(
         team=team,
         defaults={
@@ -117,7 +110,6 @@ def update_league_table(team):
 
 @api_view(["GET"])
 def list_matches(request):
-    """List all matches."""
     matches = Match.objects.all()
     serializer = MatchSerializer(matches, many=True)
     return Response(serializer.data)
@@ -125,7 +117,6 @@ def list_matches(request):
 
 @api_view(["GET"])
 def list_league_table(request):
-    """List the league table sorted by wins and draws."""
     league_table = LeagueTable.objects.all().order_by("-wins", "-draws")
     serializer = LeagueTableSerializer(league_table, many=True)
     return Response(serializer.data)
@@ -133,7 +124,6 @@ def list_league_table(request):
 
 @api_view(["POST"])
 def generate_league_table(request):
-    """Generate or update the league table based on current match results."""
     teams = Club.objects.all()
     for team in teams:
         update_league_table(team)
@@ -143,10 +133,9 @@ def generate_league_table(request):
 
 @api_view(["POST"])
 def reset_league_table(request):
-    """Reset matches and generate a new league table."""
-    Match.objects.all().delete()  # Clear existing matches
-    LeagueTable.objects.all().delete()  # Clear existing league table entries
+    Match.objects.all().delete()  
+    LeagueTable.objects.all().delete()  
 
     return Response(
         {"reset": "OK"}
-    )  # automate_matches(request)  # Call automate_matches to generate new matches
+    )  
