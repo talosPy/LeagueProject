@@ -11,9 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.permissions import IsAdminUser
 
 
-
 team_ids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-
 
 @api_view(["POST"])
 def add_match(request):
@@ -22,7 +20,6 @@ def add_match(request):
         serializer.save()
         return Response(serializer.data, status=201)
     return Response(serializer.errors, status=400)
-
 
 @api_view(["POST"])
 def automate_matches(request):
@@ -47,7 +44,6 @@ def automate_matches(request):
 
     return Response({"matches_created": Match.objects.count()}, status=201)
 
-
 @api_view(["POST"])
 def play_fixture(request, fixture=0):
     fixture_date = date.today() + timedelta(days=fixture * 7)
@@ -66,7 +62,6 @@ def play_fixture(request, fixture=0):
         update_league_table(home_team)
         update_league_table(away_team)
     return Response({"message": "fixture played! "})
-
 
 def update_league_table(team):
     matches = Match.objects.filter(home_team=team) | Match.objects.filter(
@@ -107,20 +102,17 @@ def update_league_table(team):
         },
     )
 
-
 @api_view(["GET"])
 def list_matches(request):
     matches = Match.objects.all()
     serializer = MatchSerializer(matches, many=True)
     return Response(serializer.data)
 
-
 @api_view(["GET"])
 def list_league_table(request):
     league_table = LeagueTable.objects.all().order_by("-wins", "-draws")
     serializer = LeagueTableSerializer(league_table, many=True)
     return Response(serializer.data)
-
 
 @api_view(["POST"])
 def generate_league_table(request):
@@ -130,7 +122,6 @@ def generate_league_table(request):
 
     return Response({"message": "League table updated successfully."}, status=200)
 
-
 @api_view(["POST"])
 def reset_league_table(request):
     Match.objects.all().delete()  
@@ -138,4 +129,4 @@ def reset_league_table(request):
 
     return Response(
         {"reset": "OK"}
-    )  
+    )
