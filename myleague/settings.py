@@ -18,7 +18,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['leagueproject.onrender.com', '127.0.0.1']
+ALLOWED_HOSTS = ['leagueproject.onrender.com', '127.0.0.1', 'http://localhost:3000']
 CORS_ALLOW_ALL_ORIGINS = True
 CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = ['https://leagueproject.onrender.com']
@@ -62,6 +62,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5500",
     "http://127.0.0.1:5500",
     "https://leagueproject.onrender.com",
+    "http://localhost:3000"
 ]
 
 ROOT_URLCONF = 'myleague.urls'
