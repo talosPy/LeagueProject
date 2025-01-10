@@ -12,7 +12,6 @@ urlpatterns = [
     path('players/', include('players.urls')),
     path('matches/', include('matches.urls')),  # Include matches app URLs
     path('users/', include('users.urls')),  # Include matches app URLs
-    
     path('refresh/', TokenRefreshView.as_view(), name='refresh'),
 
 ]
