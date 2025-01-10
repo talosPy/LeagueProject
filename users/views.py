@@ -3,7 +3,12 @@ from rest_framework.decorators import api_view
 from .models import LeagueUser
 from .serializers import LeagueUserSerializer
 from rest_framework import status
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializers import CustomTokenObtainPairSerializer
 
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
 
 
 @api_view(["POST"])
@@ -22,7 +27,9 @@ def register(request):
 @api_view(["GET"])
 def view_user(request):
     if not request.user.is_authenticated:
-        return Response({"error": "User is not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(
+            {"error": "User is not authenticated"}, status=status.HTTP_401_UNAUTHORIZED
+        )
 
     serializer = LeagueUserSerializer(request.user)
     return Response(serializer.data, status=status.HTTP_200_OK)
