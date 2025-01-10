@@ -1,5 +1,7 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import LeagueUser
+from rest_framework import serializers
+
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -7,8 +9,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
 
         # Add custom claims based on LeagueUser fields
-        token['username'] = user.username
-        token['isAdmin'] = user.is_staff  # Adjust this field if `isAdmin` differs in LeagueUser
+        token["username"] = user.username
+        token["isAdmin"] = (
+            user.is_staff
+        )  # Adjust this field if `isAdmin` differs in LeagueUser
 
         return token
 
@@ -17,12 +21,12 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         # Include additional fields in the response
         user = self.user  # The authenticated user
-        data['username'] = user.username
-        data['isAdmin'] = user.is_staff  # Adjust this based on your model
+        data["username"] = user.username
+        data["isAdmin"] = user.is_staff  # Adjust this based on your model
         return data
 
 
 class LeagueUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = LeagueUser
-        fields = '__all__'
+        fields = "__all__"
